@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="reset_button">#969696</color>
+    <color name="delete_button">#F44336</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="grey">#89000000</color>
+    <color name="main_bars">#ffffff</color>
+
+    <color name="color_primary">#e76f51</color>
+    <color name="color_primary_variant">#f4a261</color>
+    <color name="color_on_primary">#FFFFFF</color>
+
+    <color name="color_secondary">#2a9d8f</color>
+    <color name="color_secondary_variant">#264653</color>
+    <color name="color_on_secondary">#e9c46a</color>
+
+    <color name="clear">#00000000</color>
+
+
+    <color xmlns:tools="http://schemas.android.com/tools" name="black_override" tools:override="true">
+        #000000
+    </color>
+    <color xmlns:tools="http://schemas.android.com/tools" name="white_override" tools:override="true">
+        #ffffff
+    </color>
+    <color xmlns:tools="http://schemas.android.com/tools" name="grey_override" tools:override="true">
+        #89000000
+    </color>
+
+    <color xmlns:tools="http://schemas.android.com/tools" name="mtrl_textinput_default_box_stroke_color" tools:override="true">
+        #f1faee
+    </color>
+
+</resources>

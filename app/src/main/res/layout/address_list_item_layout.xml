@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="obj"
+            type="com.example.tuckbox.datamodel.entity.Address" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/main_space_size"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/addressItemName"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/main_size_small"
+                    android:ellipsize="end"
+                    android:gravity="center|start"
+                    android:maxLines="1"
+                    android:text="@{obj.toString(), default=Address}"
+                    android:textSize="@dimen/main_text_size_small" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cartItemAdd"
+                style="@style/ColorIconOnlySmall"
+                android:layout_width="@dimen/main_size_small"
+                android:layout_height="@dimen/main_size_small"
+                android:onClickDeleteItem="@{obj}"
+                app:icon="@drawable/ic_baseline_delete_forever_24"
+                app:iconGravity="textTop"
+                app:iconTint="@color/material_on_background_disabled" />
+
+        </LinearLayout>
+    </LinearLayout>
+</layout>

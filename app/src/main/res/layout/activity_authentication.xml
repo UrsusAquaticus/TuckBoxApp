@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:id="@+id/authRootLayout"
+        style="@style/MainBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top"
+        android:orientation="vertical"
+        tools:context=".AuthenticationActivity">
+
+        <ImageView
+            android:id="@+id/authLogo"
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:contentDescription="Logo"
+            android:padding="16dp"
+            app:srcCompat="@drawable/ic_baseline_fastfood"
+            app:tint="@color/color_on_primary" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/authProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="3dp"
+                android:indeterminate="true"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@id/authTabs"
+                android:background="@color/color_secondary_variant"/>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/authTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/color_secondary_variant"
+                android:elevation="2dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tabIndicatorColor="@color/color_on_primary"
+                app:tabTextColor="@color/color_on_primary" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/authPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:animateLayoutChanges="true" />
+
+
+    </LinearLayout>
+</layout>

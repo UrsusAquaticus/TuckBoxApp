@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="OrderListHeader">
+        <attr name="foodName" format="string" />
+        <attr name="foodOption" format="string" />
+        <attr name="amount" format="string" />
+        <attr name="subTotal" format="string" />
+    </declare-styleable>
+</resources>

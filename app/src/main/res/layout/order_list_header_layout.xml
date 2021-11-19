@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        tools:parentTag="android.widget.LinearLayout">
+
+        <TextView
+            android:id="@+id/headerItemName"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/main_size_small"
+            android:layout_marginEnd="@dimen/main_space_size"
+            android:layout_weight="1"
+            android:gravity="center|start"
+            android:maxLines="1"
+            android:textSize="@dimen/main_text_size_small"
+            android:textStyle="bold"
+            tools:text="foodName" />
+
+        <TextView
+            android:id="@+id/headerItemCount"
+            android:layout_width="@dimen/main_size_large"
+            android:layout_height="@dimen/main_size_small"
+            android:layout_marginEnd="@dimen/main_space_size"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textSize="@dimen/main_text_size_small"
+            android:textStyle="bold"
+            tools:text="amount" />
+
+        <TextView
+            android:id="@+id/headerItemPrice"
+            android:layout_width="@dimen/main_size_large"
+            android:layout_height="@dimen/main_size_small"
+            android:gravity="center|end"
+            android:maxLines="1"
+            android:textSize="@dimen/main_text_size_small"
+            android:textStyle="bold"
+            tools:text="subtotal" />
+    </LinearLayout>
+</layout>
