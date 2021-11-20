@@ -1,5 +1,6 @@
 package com.example.tuckbox.datamodel.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
 import androidx.room.Transaction;
@@ -24,7 +25,7 @@ public abstract class UserDao extends BaseDao<User> {
     abstract public List<User> getUsersByEmailAndPassword(String email, String password);
 
     @Query("Select * from Users where Users.user_id = :userId")
-    abstract public User getUserById(long userId);
+    abstract public LiveData<User> getUserById(long userId);
 
     @Query("Delete From Users")
     abstract public void nukeTable();

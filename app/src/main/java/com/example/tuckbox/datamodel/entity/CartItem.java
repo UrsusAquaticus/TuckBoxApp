@@ -69,7 +69,6 @@ public class CartItem extends BaseEntity {
         this.isComplete = isComplete;
         this.notes = notes;
         this.amount = amount;
-        Log.d("CART_ITEM", toString());
     }
 
     @Exclude

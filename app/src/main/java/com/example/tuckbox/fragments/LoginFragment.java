@@ -30,6 +30,7 @@ public class LoginFragment extends Fragment {
 
     FragmentLoginBinding binding;
     TuckBoxViewModel viewModel;
+
     public FragmentLoginBinding getBinding() {
         return binding;
     }
@@ -92,7 +93,6 @@ public class LoginFragment extends Fragment {
                     User user = doc.toObject(User.class);
 
                     Intent intent = new Intent(requireActivity(), MainActivity.class);
-                    intent.putExtra(TuckBoxViewModel.USER_OBJECT_INTENT_EXTRA, user);
                     requireActivity().startActivity(intent);
 
                     Toast.makeText(requireActivity(), "Login Success!", Toast.LENGTH_SHORT).show();
@@ -100,8 +100,8 @@ public class LoginFragment extends Fragment {
                     SharedPreferences preferences = requireActivity().getSharedPreferences(TuckBoxViewModel.USER_PREF_DATA, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putLong(TuckBoxViewModel.USER_PREF_USER_ID, user.getId());
-                    editor.putString(TuckBoxViewModel.USER_PREF_USERNAME, email);
-                    editor.putString(TuckBoxViewModel.USER_PREF_PASSWORD, password);
+                    editor.putString(TuckBoxViewModel.USER_PREF_USERNAME, user.getEmail());
+                    editor.putString(TuckBoxViewModel.USER_PREF_PASSWORD, user.getPassword());
                     editor.apply();
                 } else {
                     Toast.makeText(requireActivity(), "Login Failed!", Toast.LENGTH_SHORT).show();

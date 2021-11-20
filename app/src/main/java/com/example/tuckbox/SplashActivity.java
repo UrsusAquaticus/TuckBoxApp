@@ -1,5 +1,6 @@
 package com.example.tuckbox;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -9,8 +10,11 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 
+import com.example.tuckbox.datamodel.RemoteDbHandler;
 import com.example.tuckbox.datamodel.TuckBoxViewModel;
 import com.example.tuckbox.datamodel.entity.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -22,19 +26,70 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkUserLoginPreference();
         viewModel = TuckBoxViewModel.getViewModel(getApplication());
-        new CountDownTimer(50000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
 
-            }
-
-            @Override
-            public void onFinish() {
-                finish();
-            }
-        }.start();
+        Log.d("STARTUP", "Attempting to Contact Firestore");
+        viewModel.getAllCollectionInfo().addOnCompleteListener(
+                collectionInfo -> {
+                    if (collectionInfo.isSuccessful()) {
+                        QuerySnapshot snapshot = collectionInfo.getResult();
+                        if (snapshot != null) {
+                            if (snapshot.isEmpty()) {
+                                //Development only
+                                Log.d("STARTUP", "Firestore Empty, Attempting to populate");
+                                viewModel.addDummyData().addOnCompleteListener(
+                                        dummyData -> {
+                                            if (dummyData.isSuccessful()) {
+                                                Log.d("STARTUP", "Attempting Initial Import");
+                                                viewModel.initialImport().addOnCompleteListener(
+                                                        initialImport -> {
+                                                            Log.d("STARTUP", "Attempting second Import");
+                                                            viewModel.secondImport().addOnCompleteListener(
+                                                                    secondImport -> {
+                                                                        Log.d("STARTUP", "Attempting third Import");
+                                                                        viewModel.thirdImport().addOnCompleteListener(
+                                                                                thirdImport -> {
+                                                                                    Log.d("STARTUP", "Successfully Populated Firestore");
+                                                                                    viewModel.setUpdateListeners();
+                                                                                    checkUserLoginPreference();
+                                                                                }
+                                                                        );
+                                                                    }
+                                                            );
+                                                        }
+                                                );
+                                            } else {
+                                                Log.e("STARTUP", "Failed to Populate Firestore");
+                                            }
+                                        });
+                            } else {
+                                Log.d("STARTUP", "Attempting Initial Import");
+                                viewModel.initialImport().addOnCompleteListener(
+                                        initialImport -> {
+                                            Log.d("STARTUP", "Attempting second Import");
+                                            viewModel.secondImport().addOnCompleteListener(
+                                                    secondImport -> {
+                                                        Log.d("STARTUP", "Attempting third Import");
+                                                        viewModel.thirdImport().addOnCompleteListener(
+                                                                thirdImport -> {
+                                                                    Log.d("STARTUP", "Successfully Populated Firestore");
+                                                                    viewModel.setUpdateListeners();
+                                                                    checkUserLoginPreference();
+                                                                }
+                                                        );
+                                                    }
+                                            );
+                                        }
+                                );
+                            }
+                        } else {
+                            Log.e("STARTUP", "Snapshot is null?");
+                        }
+                    } else {
+                        Log.e("STARTUP", "Failed to Contact Firestore");
+                        checkUserLoginPreference();
+                    }
+                });
     }
 
     public void checkUserLoginPreference() {

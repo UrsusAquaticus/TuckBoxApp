@@ -3,7 +3,6 @@ package com.example.tuckbox.datamodel;
 import android.app.Application;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
 import com.example.tuckbox.R;
@@ -27,9 +26,6 @@ import com.example.tuckbox.datamodel.entity.Store;
 import com.example.tuckbox.datamodel.entity.Timeslot;
 import com.example.tuckbox.datamodel.entity.User;
 import com.example.tuckbox.datamodel.relations.OrderWithHistory;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -64,30 +60,6 @@ public class TuckBoxDataModel {
         timeslotDao = db.getTimeslotDao();
         userDao = db.getUserDao();
         remoteDbHandler = RemoteDbHandler.getInstance(this);
-
-
-        remoteDbHandler.getAll(RemoteDbHandler.COLLECTION_INFO).addOnCompleteListener(task1 -> {
-            if (task1.isSuccessful()) {
-                QuerySnapshot snapshot = task1.getResult();
-                if (snapshot != null) {
-                    if (snapshot.isEmpty()) {
-                        //Add dummy data
-                        List<Task<?>> tasks = new ArrayList<>();
-                        tasks.addAll(dummyFoodTasks());
-                        tasks.addAll(dummyStoreTasks());
-                        tasks.add(dummyUserTask());
-                        tasks.add(dummyTimeslotTask());
-                        Tasks.whenAll(tasks).addOnCompleteListener(task2 -> {
-                            //Connect to database
-                            remoteDbHandler.connectDatabases();
-                        });
-                    } else {
-                        //Connect to database normally
-                        remoteDbHandler.connectDatabases();
-                    }
-                }
-            }
-        });
     }
 
     public static TuckBoxDataModel getInstance(Application application) {
@@ -95,6 +67,38 @@ public class TuckBoxDataModel {
             Instance = new TuckBoxDataModel(application);
         }
         return Instance;
+    }
+
+    //Probably a better way to do this
+    public Task<Void> initialImport() {
+        //Connect to database normally
+        return remoteDbHandler.initialImport();
+    }
+    public Task<Void> secondImport() {
+        //Connect to database normally
+        return remoteDbHandler.secondImport();
+    }
+    public Task<Void> thirdImport() {
+        //Connect to database normally
+        return remoteDbHandler.thirdImport();
+    }
+
+    public Task<Void> addDummyData() {
+        List<Task<?>> tasks = new ArrayList<>();
+        //Add dummy data
+        tasks.addAll(dummyFoodTasks());
+        tasks.addAll(dummyStoreTasks());
+        tasks.add(dummyUserTask());
+        tasks.add(dummyTimeslotTask());
+        return Tasks.whenAll(tasks);
+    }
+
+    public void setUpdateListeners() {
+        remoteDbHandler.setAutoUpdateListeners();
+    }
+
+    public Task<QuerySnapshot> getAllCollectionInfo() {
+        return remoteDbHandler.getAll(RemoteDbHandler.COLLECTION_INFO);
     }
 
     public Class<?> getClassFromCollection(String dataCollection) {
@@ -121,7 +125,8 @@ public class TuckBoxDataModel {
         }
     }
 
-    public void delupsertFromDataCollection(String dataCollection, List<BaseEntity> entities) {
+    public void delupsertFromDataCollection(String
+                                                    dataCollection, List<BaseEntity> entities) {
         //delete update insert
         //upsert and delsert
         //https://www.py4u.net/discuss/668276
@@ -258,6 +263,8 @@ public class TuckBoxDataModel {
             return null;
         } else {
             long oldId = cartItemDao.insert(cartItem);
+            cartItem.setId(oldId);
+            Log.d("TDM", cartItem.toString());
             return remoteDbHandler.getId(CartItem.COLLECTION)
                     .addOnSuccessListener(newId -> {
                         cartItemDao.updateId(oldId, (long) newId);
@@ -299,7 +306,8 @@ public class TuckBoxDataModel {
     }
 
     //Order
-    public Task<Object> insertOrderAndCartItems(Order order, List<CartItem> cartItems) {
+    public Task<Object> insertOrderAndCartItems(Order
+                                                        order, List<CartItem> cartItems) {
         return remoteDbHandler.placeOrder(
                 order,
                 new ArrayList<>(cartItems));
@@ -325,7 +333,7 @@ public class TuckBoxDataModel {
         return remoteDbHandler.overwrite(User.COLLECTION, user);
     }
 
-    public User getUserById(long userId) {
+    public LiveData<User> getUserById(long userId) {
         return userDao.getUserById(userId);
     }
 

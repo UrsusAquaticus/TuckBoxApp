@@ -101,6 +101,7 @@ public class MenuFragment extends Fragment {
         );
 
         MainActivity.getViewModel().insertCartItem(cartItem);
+
         selectedFood = null;
         selectedOption = null;
     }

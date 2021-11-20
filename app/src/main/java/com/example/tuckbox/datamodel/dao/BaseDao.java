@@ -43,7 +43,11 @@ public abstract class BaseDao<T> {
         long id = insert(obj);
         if (id == -1) {
             //try update if insert failed
-            update(obj);
+            try {
+                update(obj);
+            } catch (Exception e) {
+                Log.e("BASEDAO", "It Broke", e);
+            }
         }
         return id;
     }

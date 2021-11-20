@@ -16,6 +16,7 @@ import com.example.tuckbox.datamodel.entity.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,48 +50,52 @@ public class RemoteDbHandler {
         return Instance;
     }
 
-    public void connectDatabases() {
+    public Task<Void> initialImport() {
+        //Have no foreign keys
         //Set local from remote making sure parents are inserted first
-        //Then add change listeners
-        //todo: Insert parent and children as a single object and skip orphans
-        setLocalFromRemote(User.COLLECTION).addOnCompleteListener(userTask -> {
-            setAutoUpdateListener(User.COLLECTION);
-            if (userTask.isSuccessful()) {
-                setLocalFromRemote(Address.COLLECTION).addOnCompleteListener(addressTask -> {
-                    setAutoUpdateListener(Address.COLLECTION);
-                });
-            }
-        });
+        List<Task<?>> tasks = new ArrayList<>();
+        //User
+        tasks.add(setLocalFromRemote(User.COLLECTION));
         //Food
-        setLocalFromRemote(Food.COLLECTION).addOnCompleteListener(foodTask -> {
-            setAutoUpdateListener(Food.COLLECTION);
-            if (foodTask.isSuccessful()) {
-                //Option
-                setLocalFromRemote(FoodOption.COLLECTION).addOnCompleteListener(optionTask -> {
-                    setAutoUpdateListener(FoodOption.COLLECTION);
-                    if (optionTask.isSuccessful()) {
-                        //Order
-                        setLocalFromRemote(Order.COLLECTION).addOnCompleteListener(orderTask -> {
-                            setAutoUpdateListener(Order.COLLECTION);
-                            if (orderTask.isSuccessful()) {
-                                //Cart Item
-                                setLocalFromRemote(CartItem.COLLECTION).addOnCompleteListener(cartItemTask -> {
-                                    setAutoUpdateListener(CartItem.COLLECTION);
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
-        setLocalFromRemote(Store.COLLECTION).addOnCompleteListener(foodTask -> {
-            setAutoUpdateListener(Store.COLLECTION);
-        });
-        setLocalFromRemote(Timeslot.COLLECTION).addOnCompleteListener(foodTask -> {
-            setAutoUpdateListener(Timeslot.COLLECTION);
-        });
+        tasks.add(setLocalFromRemote(Food.COLLECTION));
+        //Stores
+        tasks.add(setLocalFromRemote(Store.COLLECTION));
+        //Timeslots
+        tasks.add(setLocalFromRemote(Timeslot.COLLECTION));
+        return Tasks.whenAll(tasks);
     }
 
+    public Task<Void> secondImport() {
+        //Has foreign keys in initial Imports
+        //Set local from remote making sure parents are inserted first
+        List<Task<?>> tasks = new ArrayList<>();
+        //User
+        tasks.add(setLocalFromRemote(Address.COLLECTION));
+        //Food Option
+        tasks.add(setLocalFromRemote(FoodOption.COLLECTION));
+        //Orders
+        tasks.add(setLocalFromRemote(Order.COLLECTION));
+        return Tasks.whenAll(tasks);
+    }
+
+    public Task<Void> thirdImport() {
+        //Set local from remote making sure parents are inserted first
+        List<Task<?>> tasks = new ArrayList<>();
+        //Cart Items
+        tasks.add(setLocalFromRemote(CartItem.COLLECTION));
+        return Tasks.whenAll(tasks);
+    }
+
+    public void setAutoUpdateListeners() {
+        setAutoUpdateListener(User.COLLECTION);
+        setAutoUpdateListener(Address.COLLECTION);
+        setAutoUpdateListener(Food.COLLECTION);
+        setAutoUpdateListener(FoodOption.COLLECTION);
+        setAutoUpdateListener(Order.COLLECTION);
+        setAutoUpdateListener(CartItem.COLLECTION);
+        setAutoUpdateListener(Store.COLLECTION);
+        setAutoUpdateListener(Timeslot.COLLECTION);
+    }
 
     public Task<QuerySnapshot> getAll(String dataCollection) {
         FirebaseFirestore cloudDb = FirebaseFirestore.getInstance();

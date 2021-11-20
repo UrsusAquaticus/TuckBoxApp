@@ -52,6 +52,32 @@ public class TuckBoxViewModel extends ViewModel {
         return viewModel;
     }
 
+    //Probably a better way to do this
+    public Task<Void> initialImport() {
+        //Connect to database normally
+        return dataModel.initialImport();
+    }
+    public Task<Void> secondImport() {
+        //Connect to database normally
+        return dataModel.secondImport();
+    }
+    public Task<Void> thirdImport() {
+        //Connect to database normally
+        return dataModel.thirdImport();
+    }
+
+    public Task<Void> addDummyData() {
+        return dataModel.addDummyData();
+    }
+
+    public void setUpdateListeners() {
+        dataModel.setUpdateListeners();
+    }
+
+    public Task<QuerySnapshot> getAllCollectionInfo() {
+        return dataModel.getAllCollectionInfo();
+    }
+
     public void signOut(Activity activity) {
         Log.d("SIGNOUT", "Going back");
 
@@ -135,7 +161,7 @@ public class TuckBoxViewModel extends ViewModel {
         return dataModel.updateUser(user);
     }
 
-    public User getUserById(long userId) {
+    public LiveData<User> getUserById(long userId) {
         return dataModel.getUserById(userId);
     }
 

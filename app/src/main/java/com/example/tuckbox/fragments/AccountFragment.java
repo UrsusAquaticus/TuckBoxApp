@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import com.example.tuckbox.AddressActivity;
 import com.example.tuckbox.MainActivity;
@@ -43,12 +44,23 @@ public class AccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
         viewModel = MainActivity.getViewModel();
-        Intent intent = requireActivity().getIntent();
-        user = (User) intent.getExtras().get(TuckBoxViewModel.USER_OBJECT_INTENT_EXTRA);
-        binding.accountName.setText(user.getName());
-        binding.accountEmail.setText(user.getEmail());
-        binding.accountPhone.setText(user.getPhone());
-        connectButtons();
+
+        SharedPreferences preferences = requireActivity().getSharedPreferences(
+                TuckBoxViewModel.USER_PREF_DATA,
+                Context.MODE_PRIVATE);
+        long userId = preferences.getLong(TuckBoxViewModel.USER_PREF_USER_ID, -1);
+        viewModel.getUserById(userId).observe(getViewLifecycleOwner(),
+                liveUser -> {
+                    if (liveUser != null) {
+                        user = liveUser;
+                        binding.accountName.setText(liveUser.getName());
+                        binding.accountEmail.setText(liveUser.getEmail());
+                        binding.accountPhone.setText(liveUser.getPhone());
+                        connectButtons();
+                    } else {
+                        viewModel.signOut(requireActivity());
+                    }
+                });
         return binding.getRoot();
     }
 

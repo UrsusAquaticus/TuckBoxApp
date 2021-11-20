@@ -1,6 +1,7 @@
 package com.example.tuckbox;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -109,39 +110,43 @@ public class OrderActivity extends AppCompatActivity {
                     selectedAddressIndex != -1 &&
                     selectedStoreIndex != -1 &&
                     selectedTimeslotIndex != -1) {
-                User user = viewModel.getUserById(userId);
-                Address address = addressList.get(selectedAddressIndex);
-                Store store = storeList.get(selectedStoreIndex);
-                Timeslot timeslot = timeslotList.get(selectedTimeslotIndex);
-                Order order = new Order(
-                        null,
-                        user.getId(),
-                        address.getId(),
-                        store.getId(),
-                        timeslot.getId(),
-                        new Date(),
-                        "",
-                        user.toString(),
-                        address.toString(),
-                        store.toString()
-                );
-                //Get Cart items
-                List<CartItem> cartItems = CartItemWithFoodOption.getCartItems(cartItemWithFoodOptionList);
-                //Set them to complete
-                for (CartItem cartItem : cartItems) {
-                    cartItem.setComplete(true);
-                }
-                TuckBoxViewModel.setIsLoading(true);
-                viewModel.insertOrderAndCartItems(order, cartItems).addOnCompleteListener(
-                        task -> {
-                            TuckBoxViewModel.setIsLoading(false);
-                            if (task.isSuccessful()) {
-                                Toast.makeText(getBaseContext(), "Order Placed Successfully", Toast.LENGTH_SHORT).show();
-                                finish();
-                            } else {
-                                Toast.makeText(getBaseContext(), "Order Failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                viewModel.getUserById(userId).observe(this, user -> {
+                    Address address = addressList.get(selectedAddressIndex);
+                    Store store = storeList.get(selectedStoreIndex);
+                    Timeslot timeslot = timeslotList.get(selectedTimeslotIndex);
+                    Order order = new Order(
+                            null,
+                            user.getId(),
+                            address.getId(),
+                            store.getId(),
+                            timeslot.getId(),
+                            new Date(),
+                            "",
+                            user.toString(),
+                            address.toString(),
+                            store.toString()
+                    );
+                    //Get Cart items
+                    List<CartItem> cartItems = CartItemWithFoodOption.getCartItems(cartItemWithFoodOptionList);
+                    //Set them to complete
+                    for (CartItem cartItem : cartItems) {
+                        cartItem.setComplete(true);
+                    }
+                    TuckBoxViewModel.setIsLoading(true);
+                    viewModel.insertOrderAndCartItems(order, cartItems).addOnCompleteListener(
+                            task -> {
+                                TuckBoxViewModel.setIsLoading(false);
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getBaseContext(), "Order Placed Successfully", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(this, MainActivity.class);
+                                    intent.putExtra(MainActivity.IS_FROM_ORDER, true);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(getBaseContext(), "Order Failed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                });
             } else {
                 Toast.makeText(this, "Not everything was selected", Toast.LENGTH_SHORT).show();
             }

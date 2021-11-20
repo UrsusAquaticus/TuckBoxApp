@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     //https://stackoverflow.com/questions/58128491/how-to-combine-bottomnavigationview-and-viewpager
 
+    public static final String IS_FROM_ORDER = "IS_FROM_ORDER";
     public static TuckBoxViewModel viewModel;
 
     ActivityMainBinding binding;
@@ -72,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         connectLoading();
+        if (getIntent().getBooleanExtra(IS_FROM_ORDER, false)) {
+            //2 is history
+            binding.mainPager.setCurrentItem(2, false);
+            getIntent().putExtra(IS_FROM_ORDER, false);
+        }
     }
 
     private void connectLoading() {
