@@ -28,7 +28,7 @@ import java.util.List;
 
 public class TuckBoxViewModel extends ViewModel {
 
-    TuckBoxDataModel dataModel = null;
+    TuckBoxDataModel dataModel;
 
     static TuckBoxViewModel viewModel;
 
@@ -120,7 +120,7 @@ public class TuckBoxViewModel extends ViewModel {
         return dataModel.insertCartItem(cartItem);
     }
 
-    public long reduceCartItem(CartItem cartItem) {
+    public int reduceCartItem(CartItem cartItem) {
         return dataModel.reduceCartItem(cartItem);
     }
 

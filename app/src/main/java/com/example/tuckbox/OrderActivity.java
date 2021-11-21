@@ -156,16 +156,18 @@ public class OrderActivity extends AppCompatActivity {
     private void connectCartItems() {
         RecyclerView recyclerView = binding.orderRecyclerView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setAdapter(
+                new CartViewAdapter(
+                        R.layout.order_list_item_layout
+                )
+        );
         viewModel.getLiveCartItemsWithFoodOption().observe(this,
                 cartItemWithFoodOptions -> {
                     cartItemWithFoodOptionList = cartItemWithFoodOptions;
                     //update the recycler
-                    recyclerView.setAdapter(
-                            new CartViewAdapter(
-                                    R.layout.order_list_item_layout,
-                                    cartItemWithFoodOptions
-                            )
-                    );
+                    CartViewAdapter adapter = (CartViewAdapter) recyclerView.getAdapter();
+                    if (adapter != null) adapter.updateData(cartItemWithFoodOptions);
+
                     //Add up all the cart items
                     int count = 0;
                     double totalPrice = 0;
@@ -190,9 +192,9 @@ public class OrderActivity extends AppCompatActivity {
                     addressList = addresses;
                     ArrayAdapter<?> adapter = new ArrayAdapter<>(getBaseContext(), R.layout.dropdown_list_item, addresses);
                     binding.orderAddress.setAdapter(adapter);
-                    binding.orderAddress.setOnItemClickListener((parent, view, position, id) -> {
-                        selectedAddressIndex = position;
-                    });
+                    binding.orderAddress.setOnItemClickListener(
+                            (parent, view, position, id) -> selectedAddressIndex = position
+                    );
                 });
 
         //Store Names
@@ -202,9 +204,9 @@ public class OrderActivity extends AppCompatActivity {
                     storeList = stores;
                     ArrayAdapter<?> adapter = new ArrayAdapter<>(getBaseContext(), R.layout.dropdown_list_item, storeList);
                     binding.orderStore.setAdapter(adapter);
-                    binding.orderStore.setOnItemClickListener((parent, view, position, id) -> {
-                        selectedStoreIndex = position;
-                    });
+                    binding.orderStore.setOnItemClickListener(
+                            (parent, view, position, id) -> selectedStoreIndex = position
+                    );
                 });
 
         //Timeslots
@@ -214,9 +216,9 @@ public class OrderActivity extends AppCompatActivity {
                     timeslotList = timeslots;
                     ArrayAdapter<?> adapter = new ArrayAdapter<>(getBaseContext(), R.layout.dropdown_list_item, timeslotList);
                     binding.orderTimeslot.setAdapter(adapter);
-                    binding.orderTimeslot.setOnItemClickListener((parent, view, position, id) -> {
-                        selectedTimeslotIndex = position;
-                    });
+                    binding.orderTimeslot.setOnItemClickListener(
+                            (parent, view, position, id) -> selectedTimeslotIndex = position
+                    );
                 });
     }
 

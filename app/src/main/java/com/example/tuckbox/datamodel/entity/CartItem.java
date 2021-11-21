@@ -33,7 +33,7 @@ import java.util.Map;
                         entity = FoodOption.class,
                         parentColumns = "food_option_id",
                         childColumns = "food_option_id",
-                        onDelete = SET_NULL
+                        onDelete = CASCADE
                 ),
         }
 )
@@ -128,7 +128,10 @@ public class CartItem extends BaseEntity {
     @NonNull
     @Override
     public String toString() {
-        return this.id + "/" + this.orderId + "/" + this.foodOptionId;
+        return "cart_id: " + this.id +
+                " | order_id: " + this.orderId +
+                " | food_option_id:" + this.foodOptionId +
+                " | amount:" + this.amount;
     }
 
     public Long getOrderId() {

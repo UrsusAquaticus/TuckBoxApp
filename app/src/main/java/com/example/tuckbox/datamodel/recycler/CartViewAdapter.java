@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.example.tuckbox.datamodel.relations.CartItemWithFoodOption;
 import com.example.tuckbox.datamodel.relations.FoodWithOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CartViewAdapter extends SingleLayoutAdapter {
@@ -18,9 +19,13 @@ public class CartViewAdapter extends SingleLayoutAdapter {
         holder.bind(obj);
     }
 
-    public CartViewAdapter(int layoutId, List<CartItemWithFoodOption> cartList) {
+    public CartViewAdapter(int layoutId) {
         super(layoutId);
+    }
+
+    public void updateData(List<CartItemWithFoodOption> cartList) {
         this.cartList = cartList;
+        notifyDataSetChanged();
     }
 
     @Override

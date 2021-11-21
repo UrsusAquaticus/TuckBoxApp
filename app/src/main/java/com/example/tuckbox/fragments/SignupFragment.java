@@ -43,7 +43,7 @@ public class SignupFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSignupBinding.inflate(inflater, container, false);
         viewModel = AuthenticationActivity.getViewModel();
         connectSignupButton();
@@ -80,98 +80,93 @@ public class SignupFragment extends Fragment {
     }
 
     private void connectSignupButton() {
-        binding.signupSubmitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = Objects.requireNonNull(binding.signupName.getText()).toString();
-                String email = Objects.requireNonNull(binding.signupEmail.getText()).toString();
-                String phone = Objects.requireNonNull(binding.signupPhone.getText()).toString();
-                String streetAddress = Objects.requireNonNull(binding.signupAddress.getText()).toString();
-                String city = Objects.requireNonNull(binding.signupCity.getText()).toString();
-                String postCode = Objects.requireNonNull(binding.signupPostcode.getText()).toString();
-                String password = Objects.requireNonNull(binding.signupPassword.getText()).toString();
-                String confirmPassword = Objects.requireNonNull(binding.signupConfirmPassword.getText()).toString();
-                Log.d("SIGNUP", name + " " + email + " " + password + " " + confirmPassword);
-                if (!TextUtils.isEmpty(name)) {
-                    if (isValidEmail(email)) {
-                        if (!TextUtils.isEmpty(phone)) {
-                            if (!TextUtils.isEmpty(streetAddress)) {
-                                if (!TextUtils.isEmpty(city)) {
-                                    if (!TextUtils.isEmpty(postCode)) {
-                                        if (!TextUtils.isEmpty(password) && password.length() >= 7) {
-                                            if (password.equals(confirmPassword)) {
-                                                //Create New user
-                                                User user = new User(
-                                                        null,
-                                                        name,
-                                                        email,
-                                                        phone,
-                                                        password
-                                                );
-                                                Address address = new Address(
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        streetAddress,
-                                                        city,
-                                                        city,
-                                                        postCode
-                                                );
-                                                TuckBoxViewModel.setIsLoading(true);
-                                                viewModel.register(user, address).addOnCompleteListener(
-                                                        task -> {
-                                                            TuckBoxViewModel.setIsLoading(false);
-                                                            if (task.isSuccessful()) {
-                                                                User newUser = task.getResult();
-                                                                if (newUser != null) {
-                                                                    //Store Login session
-                                                                    SharedPreferences preferences = requireActivity().getSharedPreferences(TuckBoxViewModel.USER_PREF_DATA, Context.MODE_PRIVATE);
-                                                                    SharedPreferences.Editor editor = preferences.edit();
-                                                                    editor.putLong(TuckBoxViewModel.USER_PREF_USER_ID, newUser.getId());
-                                                                    editor.putString(TuckBoxViewModel.USER_PREF_USERNAME, email);
-                                                                    editor.putString(TuckBoxViewModel.USER_PREF_PASSWORD, password);
-                                                                    editor.apply();
+        binding.signupSubmitButton.setOnClickListener(
+                v -> {
+                    String name = Objects.requireNonNull(binding.signupName.getText()).toString();
+                    String email = Objects.requireNonNull(binding.signupEmail.getText()).toString();
+                    String phone = Objects.requireNonNull(binding.signupPhone.getText()).toString();
+                    String streetAddress = Objects.requireNonNull(binding.signupAddress.getText()).toString();
+                    String city = Objects.requireNonNull(binding.signupCity.getText()).toString();
+                    String postCode = Objects.requireNonNull(binding.signupPostcode.getText()).toString();
+                    String password = Objects.requireNonNull(binding.signupPassword.getText()).toString();
+                    String confirmPassword = Objects.requireNonNull(binding.signupConfirmPassword.getText()).toString();
+                    Log.d("SIGNUP", name + " " + email + " " + password + " " + confirmPassword);
+                    if (!TextUtils.isEmpty(name)) {
+                        if (isValidEmail(email)) {
+                            if (!TextUtils.isEmpty(phone)) {
+                                if (!TextUtils.isEmpty(streetAddress)) {
+                                    if (!TextUtils.isEmpty(city)) {
+                                        if (!TextUtils.isEmpty(postCode)) {
+                                            if (!TextUtils.isEmpty(password) && password.length() >= 7) {
+                                                if (password.equals(confirmPassword)) {
+                                                    //Create New user
+                                                    User user = new User(
+                                                            null,
+                                                            name,
+                                                            email,
+                                                            phone,
+                                                            password
+                                                    );
+                                                    Address address = new Address(
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            streetAddress,
+                                                            city,
+                                                            city,
+                                                            postCode
+                                                    );
+                                                    TuckBoxViewModel.setIsLoading(true);
+                                                    viewModel.register(user, address).addOnCompleteListener(
+                                                            task -> {
+                                                                TuckBoxViewModel.setIsLoading(false);
+                                                                if (task.isSuccessful()) {
+                                                                    User newUser = task.getResult();
+                                                                    if (newUser != null) {
+                                                                        //Go to main activity
+                                                                        Intent intent = new Intent(requireActivity(), MainActivity.class);
+                                                                        requireActivity().startActivity(intent);
 
-                                                                    //Go to main activity
-                                                                    Intent intent = new Intent(requireActivity(), MainActivity.class);
-                                                                    intent.putExtra(TuckBoxViewModel.USER_OBJECT_INTENT_EXTRA, newUser);
-                                                                    requireActivity().startActivity(intent);
-                                                                    requireActivity().finish();
-
-                                                                    Toast.makeText(requireActivity(), "Registration Success!", Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(requireActivity(), "Registration Success!", Toast.LENGTH_SHORT).show();
+                                                                        //Store Login session
+                                                                        SharedPreferences preferences = requireActivity().getSharedPreferences(TuckBoxViewModel.USER_PREF_DATA, Context.MODE_PRIVATE);
+                                                                        SharedPreferences.Editor editor = preferences.edit();
+                                                                        editor.putLong(TuckBoxViewModel.USER_PREF_USER_ID, newUser.getId());
+                                                                        editor.putString(TuckBoxViewModel.USER_PREF_USERNAME, email);
+                                                                        editor.putString(TuckBoxViewModel.USER_PREF_PASSWORD, password);
+                                                                        editor.apply();
+                                                                    } else {
+                                                                        Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                                                    }
                                                                 } else {
                                                                     Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
                                                                 }
-                                                            } else {
-                                                                Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
+                                                            });
+                                                } else {
+                                                    Toast.makeText(getContext(), "Passwords don't match, try again", Toast.LENGTH_SHORT).show();
+                                                }
                                             } else {
-                                                Toast.makeText(getContext(), "Passwords don't match, try again", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getContext(), "Please Enter a password of 7 or greater characters", Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            Toast.makeText(getContext(), "Please Enter a password of 7 or greater characters", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getContext(), "Please Enter a postcode", Toast.LENGTH_SHORT).show();
                                         }
                                     } else {
-                                        Toast.makeText(getContext(), "Please Enter a postcode", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), "Please Enter a city", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Toast.makeText(getContext(), "Please Enter a city", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Please Enter an address", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Toast.makeText(getContext(), "Please Enter an address", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Please Enter a phone number", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(getContext(), "Please Enter a phone number", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Please Enter a valid email", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getContext(), "Please Enter a valid email", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Please Enter a Name", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getContext(), "Please Enter a Name", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                });
     }
 
     public static boolean isValidEmail(CharSequence target) {

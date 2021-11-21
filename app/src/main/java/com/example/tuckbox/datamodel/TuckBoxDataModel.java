@@ -74,10 +74,12 @@ public class TuckBoxDataModel {
         //Connect to database normally
         return remoteDbHandler.initialImport();
     }
+
     public Task<Void> secondImport() {
         //Connect to database normally
         return remoteDbHandler.secondImport();
     }
+
     public Task<Void> thirdImport() {
         //Connect to database normally
         return remoteDbHandler.thirdImport();
@@ -266,15 +268,15 @@ public class TuckBoxDataModel {
             cartItem.setId(oldId);
             Log.d("TDM", cartItem.toString());
             return remoteDbHandler.getId(CartItem.COLLECTION)
-                    .addOnSuccessListener(newId -> {
-                        cartItemDao.updateId(oldId, (long) newId);
-                    })
+                    .addOnSuccessListener(
+                            newId -> cartItemDao.updateId(oldId, (long) newId)
+                    )
                     .addOnFailureListener(
                             e -> Log.e("CART_ITEM_INSERT", "Failed to get a new ID for Cart Item", e));
         }
     }
 
-    public long reduceCartItem(CartItem cartItem) {
+    public int reduceCartItem(CartItem cartItem) {
         //Check if Food with option is already in the cart
         CartItem existingCartItem = cartItemDao.getCartItemByFoodOptionId(cartItem.getFoodOptionId());
         if (existingCartItem != null) {
@@ -539,6 +541,91 @@ public class TuckBoxDataModel {
                         "Salad",
                         R.drawable.noodle,
                         13.00
+                ),
+                FoodOption.COLLECTION,
+                new ArrayList<>(foodOptions),
+                "foodId"));
+        //Sushi
+        foodOptions.clear();
+        foodOptions.add(new FoodOption(
+                null,
+                null,
+                "Salmon",
+                "Sushi",
+                0f
+        ));
+        foodOptions.add(new FoodOption(
+                null,
+                null,
+                "Chicken",
+                "Sushi",
+                0f
+        ));
+        foodOptions.add(new FoodOption(
+                null,
+                null,
+                "Tofu",
+                "Sushi",
+                0f
+        ));
+        tasks.add(remoteDbHandler.setWithChildren(
+                Food.COLLECTION,
+                new Food(
+                        null,
+                        "Sushi 12pc",
+                        "Sushi is a traditional Japanese dish of" +
+                                " prepared vinegared rice, usually with some " +
+                                "sugar and salt, accompanied by a variety of " +
+                                "ingredients, such as seafood, often raw, and vegetables.",
+                        "Sushi",
+                        R.drawable.sushi,
+                        12.00
+                ),
+                FoodOption.COLLECTION,
+                new ArrayList<>(foodOptions),
+                "foodId"));
+        //Kebab
+        foodOptions.clear();
+        foodOptions.add(new FoodOption(
+                null,
+                null,
+                "Lamb",
+                "Kebab",
+                0f
+        ));
+        foodOptions.add(new FoodOption(
+                null,
+                null,
+                "Beef",
+                "Kebab",
+                0f
+        ));
+        foodOptions.add(new FoodOption(
+                null,
+                null,
+                "Chicken",
+                "Kebab",
+                0f
+        ));
+        foodOptions.add(new FoodOption(
+                null,
+                null,
+                "Falafel",
+                "Kebab",
+                0f
+        ));
+        tasks.add(remoteDbHandler.setWithChildren(
+                Food.COLLECTION,
+                new Food(
+                        null,
+                        "Doner Kebab",
+                        "Doner kebab is a type of kebab, made of meat " +
+                                "cooked on a vertical rotisserie. Seasoned meat " +
+                                "stacked in the shape of an inverted cone is turned " +
+                                "slowly on the rotisserie, next to a vertical cooking element. ",
+                        "Kebab",
+                        R.drawable.kebab,
+                        10.75
                 ),
                 FoodOption.COLLECTION,
                 new ArrayList<>(foodOptions),

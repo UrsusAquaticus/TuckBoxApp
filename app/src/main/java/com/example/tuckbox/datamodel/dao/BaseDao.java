@@ -46,7 +46,7 @@ public abstract class BaseDao<T> {
             try {
                 update(obj);
             } catch (Exception e) {
-                Log.e("BASEDAO", "It Broke", e);
+                Log.e("BASEDAO", obj.toString(), e);
             }
         }
         return id;

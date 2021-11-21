@@ -1,5 +1,7 @@
 package com.example.tuckbox.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -62,14 +64,17 @@ public class CartFragment extends Fragment {
         RecyclerView recyclerView = binding.cartRecyclerView;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        recyclerView.setAdapter(
+                new CartViewAdapter(
+                        R.layout.cart_list_item_layout
+                )
+        );
         viewModel.getLiveCartItemsWithFoodOption().observe(getViewLifecycleOwner(),
                 cartItemWithFoodOptions -> {
-                    recyclerView.setAdapter(
-                            new CartViewAdapter(
-                                    R.layout.cart_list_item_layout,
-                                    cartItemWithFoodOptions
-                            )
-                    );
+                    //update the recycler
+                    CartViewAdapter adapter = (CartViewAdapter) recyclerView.getAdapter();
+                    if (adapter != null) adapter.updateData(cartItemWithFoodOptions);
+
                     //Add up all the cart items
                     itemCount = 0;
                     double totalPrice = 0;
@@ -84,6 +89,7 @@ public class CartFragment extends Fragment {
                     binding.setTotalString(nf.format(totalPrice));
                     //For displaying empty cart message
                     binding.setIsEmpty(itemCount == 0);
+
                 });
 
         return binding.getRoot();
