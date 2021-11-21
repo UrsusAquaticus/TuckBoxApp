@@ -33,14 +33,14 @@ import java.util.Map;
 public class RemoteDbHandler {
 
     static RemoteDbHandler Instance = null;
-    TuckBoxDataModel dataModel = null;
+    TuckBoxDataModel dataModel;
 
-    static List<ListenerRegistration> listeners = null;
+    static Map<String, ListenerRegistration> listeners = null;
     static String COLLECTION_INFO = "COLLECTION_INFO";
 
     private RemoteDbHandler(TuckBoxDataModel dataModel) {
         this.dataModel = dataModel;
-        listeners = new ArrayList<>();
+        listeners = new HashMap<>();
     }
 
     public static RemoteDbHandler getInstance(TuckBoxDataModel dataModel) {
@@ -87,6 +87,7 @@ public class RemoteDbHandler {
     }
 
     public void setAutoUpdateListeners() {
+        clearListeners();
         setAutoUpdateListener(User.COLLECTION);
         setAutoUpdateListener(Address.COLLECTION);
         setAutoUpdateListener(Food.COLLECTION);
@@ -103,9 +104,17 @@ public class RemoteDbHandler {
     }
 
     public void clearListeners() {
-        for (ListenerRegistration registration :
-                listeners) {
-            registration.remove();
+        for (Map.Entry<String, ListenerRegistration> listenerEntry : listeners.entrySet()) {
+            listenerEntry.getValue().remove();
+        }
+        listeners.clear();
+    }
+
+    public void removeListener(String dataCollection) {
+        ListenerRegistration listener = listeners.get(dataCollection);
+        if (listener != null) {
+            listener.remove();
+            listeners.remove(dataCollection);
         }
     }
 
@@ -300,32 +309,27 @@ public class RemoteDbHandler {
         FirebaseFirestore cloudDb = FirebaseFirestore.getInstance();
         return cloudDb.collection(dataCollection)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        if (queryDocumentSnapshots != null) {
-                            //create list of entities to add
-                            List<BaseEntity> entities = new ArrayList<>();
-                            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                                BaseEntity entity = doc.toObject(
-                                        (Class<BaseEntity>) dataModel.getClassFromCollection(dataCollection)
-                                );
-                                entities.add(entity);
+                .addOnSuccessListener(
+                        queryDocumentSnapshots -> {
+                            if (queryDocumentSnapshots != null) {
+                                //create list of entities to add
+                                List<BaseEntity> entities = new ArrayList<>();
+                                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                    BaseEntity entity = doc.toObject(
+                                            (Class<BaseEntity>) dataModel.getClassFromCollection(dataCollection)
+                                    );
+                                    entities.add(entity);
+                                }
+                                //Insert all entities
+                                Log.d("SET_LOCAL_FROM_REMOTE_" + dataCollection, "Delupsert " + entities.size() + " Entities");
+                                dataModel.delupsertFromDataCollection(dataCollection, entities);
+                            } else {
+                                Log.d("SET_LOCAL_FROM_REMOTE_" + dataCollection, "No Documents Returned");
                             }
-                            //Insert all entities
-                            Log.d("SET_LOCAL_FROM_REMOTE_" + dataCollection, "Delupsert " + entities.size() + " Entities");
-                            dataModel.delupsertFromDataCollection(dataCollection, entities);
-                        } else {
-                            Log.d("SET_LOCAL_FROM_REMOTE_" + dataCollection, "No Documents Returned");
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("SET_LOCAL_FROM_REMOTE_" + dataCollection, "Error getting documents: ", e);
-                    }
-                });
+                        })
+                .addOnFailureListener(
+                        e -> Log.e("SET_LOCAL_FROM_REMOTE_" + dataCollection, "Error getting documents: ", e)
+                );
     }
 
     public void setAutoUpdateListener(String dataCollection) {
@@ -359,7 +363,7 @@ public class RemoteDbHandler {
                     }
                 });
         //add to listeners
-        listeners.add(listenerRegistration);
+        listeners.put(dataCollection, listenerRegistration);
     }
 
     public Task<QuerySnapshot> login(String email, String password) {
@@ -410,7 +414,7 @@ public class RemoteDbHandler {
     }
 
     //Cart items already have a firebase ID
-    public Task<Object> placeOrder(Order order, List<CartItem> cartItemList) {
+    public Task<Order> placeOrder(Order order, List<CartItem> cartItemList) {
         FirebaseFirestore cloudDb = FirebaseFirestore.getInstance();
         DocumentReference orderCollectionInfo = cloudDb.collection(COLLECTION_INFO).document(Order.COLLECTION);
         DocumentReference cartItemCollectionInfo = cloudDb.collection(COLLECTION_INFO).document(CartItem.COLLECTION);
@@ -436,10 +440,10 @@ public class RemoteDbHandler {
                 //Update child with parent's Id
                 transaction.update(childDoc, "orderId", orderCount);
             }
-            return null;
+            return order;
         })
-                .addOnFailureListener(e -> {
-                    Log.e("PLACE_ORDER", "Set Failure", e);
-                });
+                .addOnFailureListener(
+                        e -> Log.e("PLACE_ORDER", "Set Failure", e)
+                );
     }
 }

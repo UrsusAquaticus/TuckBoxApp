@@ -58,7 +58,10 @@ public class OrderWithHistory {
         for (CartItemWithFoodOption cartItemWithFoodOption :
                 cartItemWithFoodOptionList) {
             sb.append(
-                    cartItemWithFoodOption.optionWithFood.food.getName()
+                    truncate(
+                            cartItemWithFoodOption.optionWithFood.food.getName(),
+                            20
+                    )
             );
             if (i++ != cartItemWithFoodOptionList.size() - 1) {
                 sb.append("\n"); //Add new line if not last item
@@ -73,7 +76,10 @@ public class OrderWithHistory {
         for (CartItemWithFoodOption cartItemWithFoodOption :
                 cartItemWithFoodOptionList) {
             sb.append(
-                    cartItemWithFoodOption.optionWithFood.foodOption.getName()
+                    truncate(
+                            cartItemWithFoodOption.optionWithFood.foodOption.getName(),
+                            8
+                    )
             );
             if (i++ != cartItemWithFoodOptionList.size() - 1) {
                 sb.append("\n"); //Add new line if not last item
@@ -111,5 +117,13 @@ public class OrderWithHistory {
             }
         }
         return sb.toString();
+    }
+
+    //http://www.java2s.com/example/java-utility-method/string-truncate/truncate-string-original-string-ellipsis-int-maxlength-ed815.html
+    public static String truncate(String original, int maxLength) {
+        if (original.length() > maxLength) {
+            return original.substring(0, maxLength - 3) + "...";
+        }
+        return original;
     }
 }

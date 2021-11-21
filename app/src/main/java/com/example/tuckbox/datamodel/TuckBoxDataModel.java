@@ -26,6 +26,7 @@ import com.example.tuckbox.datamodel.entity.Store;
 import com.example.tuckbox.datamodel.entity.Timeslot;
 import com.example.tuckbox.datamodel.entity.User;
 import com.example.tuckbox.datamodel.relations.OrderWithHistory;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -97,6 +98,10 @@ public class TuckBoxDataModel {
 
     public void setUpdateListeners() {
         remoteDbHandler.setAutoUpdateListeners();
+    }
+
+    public void setUpdateListener(String dataCollection) {
+        remoteDbHandler.setAutoUpdateListener(dataCollection);
     }
 
     public Task<QuerySnapshot> getAllCollectionInfo() {
@@ -269,7 +274,7 @@ public class TuckBoxDataModel {
             Log.d("TDM", cartItem.toString());
             return remoteDbHandler.getId(CartItem.COLLECTION)
                     .addOnSuccessListener(
-                            newId -> cartItemDao.updateId(oldId, (long) newId)
+                            newId -> cartItemDao.updateId(oldId, newId)
                     )
                     .addOnFailureListener(
                             e -> Log.e("CART_ITEM_INSERT", "Failed to get a new ID for Cart Item", e));
@@ -308,8 +313,10 @@ public class TuckBoxDataModel {
     }
 
     //Order
-    public Task<Object> insertOrderAndCartItems(Order
-                                                        order, List<CartItem> cartItems) {
+    public Task<Order> insertOrderAndCartItems(Order order, List<CartItem> cartItems) {
+        //Clear listeners and add them back in so that cart items shouldn't? be updated
+        //before order comes back to be inserted
+        remoteDbHandler.removeListener(CartItem.COLLECTION);
         return remoteDbHandler.placeOrder(
                 order,
                 new ArrayList<>(cartItems));

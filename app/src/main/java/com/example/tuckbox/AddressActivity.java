@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,12 +44,27 @@ public class AddressActivity extends AppCompatActivity {
         userId = preferences.getLong(TuckBoxViewModel.USER_PREF_USER_ID, -1);
 
         connectAddressList();
+        connectToolbar();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         connectLoading();
+    }
+
+    private void connectToolbar() {
+        binding.addressToolbar.setOnMenuItemClickListener(item -> {
+                    Log.d("OPTIONS", "Going back");
+                    if (item.getItemId() == R.id.appbarSignout) {
+                        viewModel.signOut(AddressActivity.this);
+                    }
+                    return true;
+                }
+        );
+        binding.addressToolbar.setNavigationOnClickListener(
+                v -> finish()
+        );
     }
 
     private void connectLoading() {

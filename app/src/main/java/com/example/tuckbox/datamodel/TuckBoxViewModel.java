@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.tuckbox.AuthenticationActivity;
+import com.example.tuckbox.MainActivity;
 import com.example.tuckbox.datamodel.entity.Address;
 import com.example.tuckbox.datamodel.entity.CartItem;
 import com.example.tuckbox.datamodel.entity.Order;
@@ -22,9 +24,11 @@ import com.example.tuckbox.datamodel.relations.FoodWithOptions;
 import com.example.tuckbox.datamodel.entity.User;
 import com.example.tuckbox.datamodel.relations.OrderWithHistory;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
+import java.util.Objects;
 
 public class TuckBoxViewModel extends ViewModel {
 
@@ -37,8 +41,10 @@ public class TuckBoxViewModel extends ViewModel {
     public static final String USER_PREF_USERNAME = "USER_PREF_USERNAME";
     public static final String USER_PREF_PASSWORD = "USER_PREF_PASSWORD";
     public static final String USER_OBJECT_INTENT_EXTRA = "USER_OBJECT_INTENT_EXTRA";
+    public static final String JUST_SIGNED_UP = "JUST_SIGNED_UP";
 
     public static MutableLiveData<Boolean> isLoading;
+
 
     private TuckBoxViewModel(Application application) {
         dataModel = TuckBoxDataModel.getInstance(application);
@@ -52,15 +58,49 @@ public class TuckBoxViewModel extends ViewModel {
         return viewModel;
     }
 
+    public void loginUser(String email, String password, Activity activity) {
+        TuckBoxViewModel.setIsLoading(true);
+        viewModel.login(email, password).addOnCompleteListener(task -> {
+            TuckBoxViewModel.setIsLoading(false);
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (Objects.requireNonNull(querySnapshot).size() == 1) {
+                    QueryDocumentSnapshot doc = querySnapshot.iterator().next();
+                    User user = doc.toObject(User.class);
+
+                    Intent intent = new Intent(activity, MainActivity.class);
+                    activity.startActivity(intent);
+
+                    Toast.makeText(activity, "Login Success!", Toast.LENGTH_SHORT).show();
+
+                    SharedPreferences preferences = activity.getSharedPreferences(TuckBoxViewModel.USER_PREF_DATA, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putLong(TuckBoxViewModel.USER_PREF_USER_ID, user.getId());
+                    editor.putString(TuckBoxViewModel.USER_PREF_USERNAME, user.getEmail());
+                    editor.putString(TuckBoxViewModel.USER_PREF_PASSWORD, user.getPassword());
+                    editor.apply();
+                } else {
+                    Toast.makeText(activity, "Login Failed!", Toast.LENGTH_SHORT).show();
+                    Log.d("F_LOGIN_CALLBACK", "Successful but did not return 1. n=" + querySnapshot.size());
+                }
+            } else {
+                Toast.makeText(activity, "Login Failed!", Toast.LENGTH_SHORT).show();
+                Log.d("F_LOGIN_CALLBACK", "Query unsuccessful");
+            }
+        });
+    }
+
     //Probably a better way to do this
     public Task<Void> initialImport() {
         //Connect to database normally
         return dataModel.initialImport();
     }
+
     public Task<Void> secondImport() {
         //Connect to database normally
         return dataModel.secondImport();
     }
+
     public Task<Void> thirdImport() {
         //Connect to database normally
         return dataModel.thirdImport();
@@ -72,6 +112,10 @@ public class TuckBoxViewModel extends ViewModel {
 
     public void setUpdateListeners() {
         dataModel.setUpdateListeners();
+    }
+
+    public void setUpdateListener(String dataCollection) {
+        dataModel.setUpdateListener(dataCollection);
     }
 
     public Task<QuerySnapshot> getAllCollectionInfo() {
@@ -134,9 +178,10 @@ public class TuckBoxViewModel extends ViewModel {
     }
 
     //Order
-    public Task<Object> insertOrderAndCartItems(Order order, List<CartItem> cartItems) {
+    public Task<Order> insertOrderAndCartItems(Order order, List<CartItem> cartItems) {
         return dataModel.insertOrderAndCartItems(order, cartItems);
     }
+
 
     public LiveData<List<OrderWithHistory>> getOrderHistoryByUserId(long userId) {
         return dataModel.getOrderHistoryByUserId(userId);

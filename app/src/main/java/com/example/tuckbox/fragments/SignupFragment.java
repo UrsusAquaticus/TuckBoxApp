@@ -119,26 +119,15 @@ public class SignupFragment extends Fragment {
                                                     TuckBoxViewModel.setIsLoading(true);
                                                     viewModel.register(user, address).addOnCompleteListener(
                                                             task -> {
-                                                                TuckBoxViewModel.setIsLoading(false);
                                                                 if (task.isSuccessful()) {
                                                                     User newUser = task.getResult();
                                                                     if (newUser != null) {
-                                                                        //Go to main activity
-                                                                        Intent intent = new Intent(requireActivity(), MainActivity.class);
-                                                                        requireActivity().startActivity(intent);
-
-                                                                        Toast.makeText(requireActivity(), "Registration Success!", Toast.LENGTH_SHORT).show();
-                                                                        //Store Login session
-                                                                        SharedPreferences preferences = requireActivity().getSharedPreferences(TuckBoxViewModel.USER_PREF_DATA, Context.MODE_PRIVATE);
-                                                                        SharedPreferences.Editor editor = preferences.edit();
-                                                                        editor.putLong(TuckBoxViewModel.USER_PREF_USER_ID, newUser.getId());
-                                                                        editor.putString(TuckBoxViewModel.USER_PREF_USERNAME, email);
-                                                                        editor.putString(TuckBoxViewModel.USER_PREF_PASSWORD, password);
-                                                                        editor.apply();
+                                                                        viewModel.loginUser(newUser.getEmail(), newUser.getPassword(), requireActivity());
                                                                     } else {
                                                                         Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
                                                                     }
                                                                 } else {
+                                                                    TuckBoxViewModel.setIsLoading(false);
                                                                     Toast.makeText(getContext(), "Something went wrong!", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             });

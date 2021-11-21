@@ -46,13 +46,42 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <com.example.tuckbox.OrderListHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            app:amount="#"
+            app:foodName="Food"
+            app:subTotal="Subtotal" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/orderRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            tools:listitem="@layout/order_list_item_layout" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey" />
+
+        <com.example.tuckbox.OrderListHeader
+            android:id="@+id/orderListFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:amount="@{totals.itemCount, default=nCount}"
+            app:subTotal="@{totals.totalPrice, default=$Count}" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingLeft="@dimen/main_space_size"
-            android:paddingRight="@dimen/main_space_size">
+            android:paddingRight="@dimen/main_space_size"
+            android:paddingBottom="@dimen/main_space_size">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/orderStoreLayout"
@@ -102,42 +131,6 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="@dimen/main_space_size"
-            android:layout_weight="1"
-            app:cardElevation="3dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/main_space_size"
-                android:orientation="vertical">
-
-                <com.example.tuckbox.OrderListHeader
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:amount="#"
-                    app:foodName="Food"
-                    app:subTotal="Subtotal" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/orderRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    tools:listitem="@layout/order_list_item_layout" />
-
-                <com.example.tuckbox.OrderListHeader
-                    android:id="@+id/orderListFooter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:amount="@{totals.itemCount, default=nCount}"
-                    app:subTotal="@{totals.totalPrice, default=$Count}" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/orderSubmitButton"

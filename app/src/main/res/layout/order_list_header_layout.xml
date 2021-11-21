@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -11,8 +10,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/color_secondary_variant"
         android:gravity="center"
         android:orientation="horizontal"
+        android:paddingLeft="@dimen/main_space_size"
+        android:paddingRight="@dimen/main_space_size"
         tools:parentTag="android.widget.LinearLayout">
 
         <TextView
@@ -23,6 +25,7 @@
             android:layout_weight="1"
             android:gravity="center|start"
             android:maxLines="1"
+            android:textColor="@color/white"
             android:textSize="@dimen/main_text_size_small"
             android:textStyle="bold"
             tools:text="foodName" />
@@ -34,6 +37,7 @@
             android:layout_marginEnd="@dimen/main_space_size"
             android:gravity="center"
             android:maxLines="1"
+            android:textColor="@color/white"
             android:textSize="@dimen/main_text_size_small"
             android:textStyle="bold"
             tools:text="amount" />
@@ -44,6 +48,7 @@
             android:layout_height="@dimen/main_size_small"
             android:gravity="center|end"
             android:maxLines="1"
+            android:textColor="@color/white"
             android:textSize="@dimen/main_text_size_small"
             android:textStyle="bold"
             tools:text="subtotal" />

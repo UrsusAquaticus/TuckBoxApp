@@ -29,6 +29,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class AuthenticationActivity extends AppCompatActivity {
+
     //https://www.androidhive.info/2020/01/viewpager2-pager-transformations-intro-slider-pager-animations-pager-transformations/
     //https://developer.android.com/topic/libraries/view-binding#java
 

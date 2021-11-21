@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <import type="android.view.View" />
+
         <variable
             name="isEmpty"
             type="Boolean" />
@@ -15,9 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/main_space_size"
-        android:paddingRight="@dimen/main_space_size">
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,13 +26,49 @@
             android:textStyle="bold"
             android:visibility="@{isEmpty ? View.VISIBLE : View.GONE, default=gone}" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_secondary_variant"
+            android:elevation="2dp"
+            android:gravity="center|start"
+            android:paddingStart="@dimen/main_space_size"
+            android:paddingEnd="@dimen/main_space_size"
+            android:text="Latest Order:"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_size_small"
+            android:textStyle="bold"
+            android:visibility="@{isEmpty ? View.GONE : View.VISIBLE, default=visible}" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/historyLatestRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:clipToPadding="false"
+            android:visibility="@{isEmpty ? View.GONE : View.VISIBLE, default=visible}" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_secondary_variant"
+            android:elevation="2dp"
+            android:gravity="center|start"
+            android:paddingStart="@dimen/main_space_size"
+            android:paddingEnd="@dimen/main_space_size"
+            android:text="Order History:"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_size_small"
+            android:textStyle="bold"
+            android:visibility="@{isEmpty ? View.GONE : View.VISIBLE, default=visible}" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/historyRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@color/white"
             android:clipToPadding="false"
-            android:paddingBottom="@dimen/main_space_size"
             android:visibility="@{isEmpty ? View.GONE : View.VISIBLE, default=visible}"
             tools:listitem="@layout/history_list_item_layout" />
     </LinearLayout>

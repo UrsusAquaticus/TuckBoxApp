@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,6 +71,7 @@ public class OrderActivity extends AppCompatActivity {
         connectDropdowns();
         connectCartItems();
         connectPlaceOrderButton();
+        connectToolbar();
     }
 
 
@@ -77,6 +79,20 @@ public class OrderActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         connectLoading();
+    }
+
+    private void connectToolbar() {
+        binding.orderToolbar.setOnMenuItemClickListener(item -> {
+                    Log.d("OPTIONS", "Going back");
+                    if (item.getItemId() == R.id.appbarSignout) {
+                        viewModel.signOut(OrderActivity.this);
+                    }
+                    return true;
+                }
+        );
+        binding.orderToolbar.setNavigationOnClickListener(
+                v -> finish()
+        );
     }
 
     private void connectLoading() {
@@ -136,6 +152,11 @@ public class OrderActivity extends AppCompatActivity {
                     viewModel.insertOrderAndCartItems(order, cartItems).addOnCompleteListener(
                             task -> {
                                 TuckBoxViewModel.setIsLoading(false);
+                                // call this again because it was cleared in datamodel
+                                // and can't be bothered merging onCompleteListeners
+                                // Maybe helps prevent cart item listener inserting before order listener
+                                // resulting in a foreign key failure
+                                viewModel.setUpdateListener(CartItem.COLLECTION);
                                 if (task.isSuccessful()) {
                                     Toast.makeText(getBaseContext(), "Order Placed Successfully", Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(this, MainActivity.class);

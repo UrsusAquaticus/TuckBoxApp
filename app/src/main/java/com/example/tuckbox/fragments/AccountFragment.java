@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
 import com.example.tuckbox.AddressActivity;
+import com.example.tuckbox.AuthenticationActivity;
 import com.example.tuckbox.MainActivity;
 import com.example.tuckbox.R;
 import com.example.tuckbox.datamodel.TuckBoxViewModel;
@@ -41,7 +42,7 @@ public class AccountFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
         viewModel = MainActivity.getViewModel();
 
@@ -49,6 +50,7 @@ public class AccountFragment extends Fragment {
                 TuckBoxViewModel.USER_PREF_DATA,
                 Context.MODE_PRIVATE);
         long userId = preferences.getLong(TuckBoxViewModel.USER_PREF_USER_ID, -1);
+        boolean justSignup = preferences.getBoolean(TuckBoxViewModel.JUST_SIGNED_UP, false);
         viewModel.getUserById(userId).observe(getViewLifecycleOwner(),
                 liveUser -> {
                     if (liveUser != null) {
@@ -58,7 +60,13 @@ public class AccountFragment extends Fragment {
                         binding.accountPhone.setText(liveUser.getPhone());
                         connectButtons();
                     } else {
-                        viewModel.signOut(requireActivity());
+                        if (justSignup) {
+                            preferences.edit()
+                                    .putBoolean(TuckBoxViewModel.JUST_SIGNED_UP, false)
+                                    .apply();
+                        } else {
+                            viewModel.signOut(requireActivity());
+                        }
                     }
                 });
         return binding.getRoot();

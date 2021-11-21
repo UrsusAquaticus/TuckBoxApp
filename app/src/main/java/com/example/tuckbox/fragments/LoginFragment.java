@@ -72,7 +72,7 @@ public class LoginFragment extends Fragment {
 
             if (email.length() >= 2) { // replace this with registration's validator
                 if (password.length() >= 7) {
-                    loginUser(email, password);
+                    viewModel.loginUser(email, password, requireActivity());
                 } else {
                     Toast.makeText(getActivity(), "Password must be longer than 2 Characters", Toast.LENGTH_SHORT).show();
                 }
@@ -82,37 +82,6 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    private void loginUser(String email, String password) {
-        TuckBoxViewModel.setIsLoading(true);
-        viewModel.login(email, password).addOnCompleteListener(task -> {
-            TuckBoxViewModel.setIsLoading(false);
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                if (Objects.requireNonNull(querySnapshot).size() == 1) {
-                    QueryDocumentSnapshot doc = querySnapshot.iterator().next();
-                    User user = doc.toObject(User.class);
-
-                    Intent intent = new Intent(requireActivity(), MainActivity.class);
-                    requireActivity().startActivity(intent);
-
-                    Toast.makeText(requireActivity(), "Login Success!", Toast.LENGTH_SHORT).show();
-
-                    SharedPreferences preferences = requireActivity().getSharedPreferences(TuckBoxViewModel.USER_PREF_DATA, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putLong(TuckBoxViewModel.USER_PREF_USER_ID, user.getId());
-                    editor.putString(TuckBoxViewModel.USER_PREF_USERNAME, user.getEmail());
-                    editor.putString(TuckBoxViewModel.USER_PREF_PASSWORD, user.getPassword());
-                    editor.apply();
-                } else {
-                    Toast.makeText(requireActivity(), "Login Failed!", Toast.LENGTH_SHORT).show();
-                    Log.d("F_LOGIN_CALLBACK", "Successful but did not return 1. n=" + querySnapshot.size());
-                }
-            } else {
-                Toast.makeText(requireActivity(), "Login Failed!", Toast.LENGTH_SHORT).show();
-                Log.d("F_LOGIN_CALLBACK", "Query unsuccessful");
-            }
-        });
-    }
 
     @Override
     public void onDestroyView() {

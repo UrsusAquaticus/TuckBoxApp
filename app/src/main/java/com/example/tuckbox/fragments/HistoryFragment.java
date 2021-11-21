@@ -17,7 +17,12 @@ import com.example.tuckbox.MainActivity;
 import com.example.tuckbox.R;
 import com.example.tuckbox.datamodel.TuckBoxViewModel;
 import com.example.tuckbox.databinding.FragmentHistoryBinding;
+import com.example.tuckbox.datamodel.entity.Order;
 import com.example.tuckbox.datamodel.recycler.HistoryViewAdapter;
+import com.example.tuckbox.datamodel.relations.OrderWithHistory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HistoryFragment extends Fragment {
 
@@ -40,24 +45,40 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        RecyclerView recyclerView = binding.historyRecyclerView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         SharedPreferences preferences = requireActivity().getSharedPreferences(
                 TuckBoxViewModel.USER_PREF_DATA,
                 Context.MODE_PRIVATE);
         long userId = preferences.getLong(TuckBoxViewModel.USER_PREF_USER_ID, -1);
 
+        RecyclerView latestRecyclerView = binding.historyLatestRecyclerView;
+        latestRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        RecyclerView recyclerView = binding.historyRecyclerView;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
         viewModel.getOrderHistoryByUserId(userId).observe(getViewLifecycleOwner(),
                 orderWithHistories -> {
+                    List<OrderWithHistory> latestOnly = new ArrayList<>();
+                    boolean isEmpty = orderWithHistories.isEmpty();
+                    binding.setIsEmpty(isEmpty);
+                    if (!isEmpty) {
+                        //Add only the first item
+                        latestOnly.add(orderWithHistories.get(0));
+                        //Remove the first item
+                        orderWithHistories.remove(0);
+                    }
+                    latestRecyclerView.setAdapter(
+                            new HistoryViewAdapter(
+                                    R.layout.history_list_item_layout,
+                                    latestOnly)
+                    );
                     recyclerView.setAdapter(
                             new HistoryViewAdapter(
                                     R.layout.history_list_item_layout,
                                     orderWithHistories
                             )
                     );
-                    binding.setIsEmpty(orderWithHistories.isEmpty());
                 });
     }
 
