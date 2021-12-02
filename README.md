@@ -1,6 +1,6 @@
 # TuckBoxApp
 
-[Assignment Requirements](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/UrsusAquaticus/TuckBoxApp/blob/master/Assignment.pdf)
+[Assignment Requirements](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/UrsusAquaticus/TuckBoxApp/master/Assignment.pdf)
 
 
 What I would do differently next time?
