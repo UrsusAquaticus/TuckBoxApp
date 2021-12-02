@@ -1,6 +1,6 @@
 # TuckBoxApp
 
-[Assignment Requirements](https://docs.google.com/viewer?url=${assignment.pdf})
+[Assignment Requirements](https://docs.google.com/viewer?url=${assignment})
 
 
 What I would do differently next time?
